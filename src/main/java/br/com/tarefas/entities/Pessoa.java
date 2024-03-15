@@ -3,7 +3,9 @@ package br.com.tarefas.entities;
 import br.com.tarefas.record.PessoaRecord;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,8 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class Pessoa {
 
     @Id
@@ -27,39 +31,6 @@ public class Pessoa {
 
     public Pessoa(PessoaRecord pessoaRecord) {
         this.nome = pessoaRecord.nome();
-        this.departamento = new Departamento(pessoaRecord.departamento());
         this.tarefas = new ArrayList<>();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public Departamento getDepartamento() {
-        return departamento;
-    }
-
-    public void setDepartamento(Departamento departamento) {
-        this.departamento = departamento;
-    }
-
-    public List<Tarefa> getTarefas() {
-        return tarefas;
-    }
-
-    public void setTarefas(List<Tarefa> tarefas) {
-        this.tarefas = tarefas;
     }
 }

@@ -1,8 +1,6 @@
 package br.com.tarefas.controller;
 
-import br.com.tarefas.entities.Pessoa;
 import br.com.tarefas.entities.Tarefa;
-import br.com.tarefas.record.PessoaRecord;
 import br.com.tarefas.record.TarefaRecord;
 import br.com.tarefas.service.TarefaService;
 import jakarta.validation.Valid;
@@ -30,25 +28,36 @@ public class TarefaController {
         return ResponseEntity.created(uri).body(new TarefaRecord(tarefa));
     }
 
-    @PutMapping
-    @RequestMapping("finalizar/{id}")
+    @PutMapping("finalizar/{id}")
     public ResponseEntity finalizaTarefa(@PathVariable Long id) {
-        Tarefa tarefaFinalizada = service.finalizaTarefa(id);
+        try {
+            Tarefa tarefaFinalizada = service.finalizaTarefa(id);
+            return ResponseEntity.ok(new TarefaRecord(tarefaFinalizada));
 
-        return ResponseEntity.ok(new TarefaRecord(tarefaFinalizada));
+        }  catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
-    @GetMapping
-    public ResponseEntity<List<Tarefa>> listarTarefasPendentes(@RequestParam(defaultValue = "3") int maxTarefas) {
+    @GetMapping("pendentes")
+    public ResponseEntity listarTarefasPendentes(@RequestParam(defaultValue = "3") int maxTarefas) {
         try {
-            // Call the service method to fetch pending tasks with earliest deadlines
             List<Tarefa> pendentes = service.listarTarefasPendentes(maxTarefas);
 
-            // Return the list of pending tasks in the response body
             return ResponseEntity.ok(pendentes);
         } catch (Exception e) {
-            // Handle potential errors
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("alocar/{id}")
+    public ResponseEntity<?> alocarPessoa(@PathVariable Long id, @RequestParam Long pessoaId) {
+        try {
+            service.alocarPessoaNaTarefa(id, pessoaId);
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 }

@@ -1,7 +1,9 @@
 package br.com.tarefas.controller;
 
 import br.com.tarefas.entities.Pessoa;
+import br.com.tarefas.record.PessoaGastosRecord;
 import br.com.tarefas.record.PessoaRecord;
+import br.com.tarefas.record.PessoaRecordData;
 import br.com.tarefas.record.TarefaRecord;
 import br.com.tarefas.service.PessoaService;
 import jakarta.persistence.EntityNotFoundException;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,12 +27,23 @@ public class PessoaController {
     private PessoaService service;
 
     @GetMapping
-    public ResponseEntity<List<PessoaRecord>> getAllPessoas() {
-        List<Pessoa> pessoas = service.getAllPessoas();
+    public ResponseEntity<List<PessoaRecordData>> listarPessoas() {
+        List<PessoaRecordData> pessoas = service.listarPessoas();
+        return new ResponseEntity<>(pessoas, HttpStatus.OK);
+    }
 
-        List<PessoaRecord> pessoasRecord = pessoas.stream().map(PessoaRecord::new).collect(Collectors.toList());
+    @GetMapping("/gastos")
+    public ResponseEntity buscarPessoasPorNomeEPeriodo(
+            @RequestParam String nome,
+            @RequestParam LocalDate dataInicio,
+            @RequestParam LocalDate dataFim) {
 
-        return ResponseEntity.ok(pessoasRecord);
+        try {
+            List<PessoaGastosRecord> pessoas = service.buscarPessoasPorNomeEPeriodo(nome, dataInicio, dataFim);
+            return new ResponseEntity<>(pessoas, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     @PostMapping
@@ -45,22 +59,21 @@ public class PessoaController {
     public ResponseEntity<?> updatePessoa(@PathVariable Long id, @RequestBody PessoaRecord pessoa) {
         try {
             Pessoa updatedPessoa = service.updatePessoa(id, pessoa);
-
             return ResponseEntity.ok(new PessoaRecord(updatedPessoa));
-        } catch (EntityNotFoundException e) {
-            // Handle the case where the Pessoa with the given id is not found
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pessoa not found with id: " + id);
-        } catch (Exception e) {
-            // Handle other potential errors
-            System.out.println(e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while updating Pessoa");
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity deletePessoa(@PathVariable Long id) {
-        service.deletaPessoa(id);
-        return ResponseEntity.noContent().build();
+        try {
+            service.deletaPessoa(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
 }

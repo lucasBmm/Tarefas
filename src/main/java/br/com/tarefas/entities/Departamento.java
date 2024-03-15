@@ -6,11 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class Departamento {
 
     @Id
@@ -23,19 +27,7 @@ public class Departamento {
         this.titulo = departamentoRecord.titulo();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTitulo() {
-        return titulo;
-    }
-
-    public void setTitulo(String titulo) {
+    public Departamento(String titulo) {
         this.titulo = titulo;
     }
 }
