@@ -81,9 +81,11 @@ public class PessoaService {
         if (optionalPessoa.isPresent()) {
             Pessoa pessoa = optionalPessoa.get();
 
-            for (Tarefa tarefa : pessoa.getTarefas()) {
-                tarefa.setPessoa(null);
-                tarefaRepository.save(tarefa);
+            if (!pessoa.getTarefas().isEmpty()) {
+                for (Tarefa tarefa : pessoa.getTarefas()) {
+                    tarefa.setPessoa(null);
+                    tarefaRepository.save(tarefa);
+                }
             }
 
             repository.delete(pessoa);

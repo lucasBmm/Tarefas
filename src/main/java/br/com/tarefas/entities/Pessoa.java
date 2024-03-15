@@ -27,7 +27,7 @@ public class Pessoa {
     private Departamento departamento;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "pessoa")
-    private List<Tarefa> tarefas;
+    private List<Tarefa> tarefas = new ArrayList<>();
 
     public Pessoa(PessoaRecord pessoaRecord) {
         this.nome = pessoaRecord.nome();

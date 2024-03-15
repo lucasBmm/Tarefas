@@ -47,7 +47,7 @@ public class DepartamentoServiceTest {
         Long departamentoId = 1L;
         Departamento expectedDepartamento = new Departamento(departamentoId, "Departamento");
 
-        when(departamentoRepository.getById(departamentoId)).thenReturn(expectedDepartamento);
+        when(departamentoRepository.findById(departamentoId)).thenReturn(Optional.of(expectedDepartamento));
 
         Optional<Departamento> foundDepartamento = departamentoService.findById(departamentoId);
 

@@ -15,6 +15,7 @@ import br.com.tarefas.entities.Tarefa;
 import br.com.tarefas.record.*;
 import br.com.tarefas.repository.DepartamentoRepository;
 import br.com.tarefas.repository.PessoaRepository;
+import br.com.tarefas.repository.TarefaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +32,8 @@ public class PessoaServiceTest {
     @Mock
     private PessoaRepository pessoaRepository;
 
+    @Mock
+    private TarefaRepository tarefaRepository;
     @Mock
     private DepartamentoService departamentoService;
 
@@ -74,7 +77,7 @@ public class PessoaServiceTest {
         Pessoa pessoa = new Pessoa();
         pessoa.setDepartamento(new Departamento());
 
-        when(pessoaRepository.getById(id)).thenReturn(pessoa);
+        when(pessoaRepository.findById(id)).thenReturn(Optional.of(pessoa));
         when(departamentoService.findById(any())).thenReturn(Optional.of(new Departamento()));
         when(departamentoRepository.save(any())).thenReturn(new Departamento());
         when(pessoaRepository.save(any())).thenReturn(pessoa);
@@ -105,15 +108,34 @@ public class PessoaServiceTest {
     }
 
     @Test
-    public void testDeletaPessoa() {
+    public void testDeletaPessoaSemTarefas() {
         Long id = 1L;
         Pessoa pessoa = new Pessoa();
 
-        when(pessoaRepository.getReferenceById(id)).thenReturn(pessoa);
+        when(pessoaRepository.findById(id)).thenReturn(Optional.of(pessoa));
 
         pessoaService.deletaPessoa(id);
 
         verify(pessoaRepository, times(1)).delete(pessoa);
+    }
+
+    @Test
+    public void testDeletaPessoa() {
+        Long id = 1L;
+        Pessoa pessoa = new Pessoa();
+
+        List<Tarefa> tarefas = new ArrayList<>();
+        Tarefa tarefa = new Tarefa();
+        tarefas.add(tarefa);
+        pessoa.setTarefas(tarefas);
+
+        when(pessoaRepository.findById(id)).thenReturn(Optional.of(pessoa));
+
+        pessoaService.deletaPessoa(id);
+
+        verify(pessoaRepository, times(1)).delete(pessoa);
+
+        verify(tarefaRepository, times(tarefas.size())).save(tarefa);
     }
 
     @Test
